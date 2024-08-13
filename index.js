@@ -31,6 +31,14 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Connect to MongoDB
 const { MONGO_URI, allowedOrigins } = require("./config/config");
+
+// Log the environment and connection target
+console.log(
+  `Connecting to database at ${
+    process.env.NODE_ENV === "development" ? "local development" : "production"
+  } environment.`
+);
+
 mongoose
   .connect(MONGO_URI)
   .then((connection) =>
@@ -44,10 +52,20 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.error(`Blocked by CORS: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(morgan("dev"));
 
