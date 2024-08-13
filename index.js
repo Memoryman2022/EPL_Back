@@ -15,6 +15,7 @@ const authRoutes = require("./routes/auth.router");
 const userRoutes = require("./routes/user.router");
 const predictionRoutes = require("./routes/prediction.router");
 const realResultRoutes = require("./routes/realResult.router");
+const externalApiRouter = require("./routes/externalApi.router");
 
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandling");
 
@@ -72,6 +73,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/predictions", predictionRoutes);
 app.use("/api/results", realResultRoutes);
+app.use("/api", externalApiRouter);
 
 // Error handling middleware
 app.use(errorHandler);
