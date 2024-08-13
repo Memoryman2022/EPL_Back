@@ -54,6 +54,18 @@ app.post("/upload", upload.single("profileImage"), (req, res) => {
   }
 });
 
+// Route to serve files from the uploads directory
+app.get("/uploads/:filename", (req, res, next) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, "uploads", filename);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      next(err); // Forward to error handling middleware
+    }
+  });
+});
+
 // Connect to MongoDB
 const connectionString = process.env.DATABASE_URL;
 const { allowedOrigins } = require("./config/config");
