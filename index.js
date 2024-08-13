@@ -30,17 +30,17 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Connect to MongoDB
-const { MONGO_URI, allowedOrigins } = require("./config/config");
-
+const connectionString = process.env.DATABASE_URL;
+const { allowedOrigins } = require("./config/config");
 // Log the environment and connection target
-console.log(
-  `Connecting to database at ${
-    process.env.NODE_ENV === "development" ? "local development" : "production"
-  } environment.`
-);
+// console.log(
+//   `Connecting to database at ${
+//     process.env.NODE_ENV === "development" ? "local development" : "production"
+//   } environment.`
+// );
 
 mongoose
-  .connect(MONGO_URI)
+  .connect(connectionString)
   .then((connection) =>
     console.log(`Connected to Database: "${connection.connections[0].name}"`)
   )
@@ -52,16 +52,11 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.error(`Blocked by CORS: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      allowedOrigins,
+      process.env.ORIGIN,
+      "https://epl2024.netlify.app/",
+    ],
     credentials: true,
   })
 );
