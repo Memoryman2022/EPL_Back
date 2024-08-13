@@ -30,6 +30,29 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir); // Save files to the uploads directory
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to file name
+  },
+});
+
+const upload = multer({ storage });
+
+// File upload route
+app.post("/upload", upload.single("profileImage"), (req, res) => {
+  try {
+    res
+      .status(200)
+      .json({ message: "File uploaded successfully", file: req.file });
+  } catch (error) {
+    res.status(500).json({ message: "Error uploading file", error });
+  }
+});
+
 // Connect to MongoDB
 const connectionString = process.env.DATABASE_URL;
 const { allowedOrigins } = require("./config/config");

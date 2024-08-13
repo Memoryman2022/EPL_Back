@@ -27,13 +27,23 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype = allowedTypes.test(file.mimetype);
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "..", "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new AppError("Error: Images only!", 400));
+    }
+  },
+  limits: { fileSize: 1024 * 1024 * 2 }, // 2MB limit
+});
 
 // Post /register
 router.post(
@@ -44,16 +54,16 @@ router.post(
       const { userName, email, password, role } = req.body;
       const profileImage = req.file ? `/uploads/${req.file.filename}` : "";
 
-      if (userName === "" || email === "" || password === "") {
-        throw new AppError("Please fill out the registration fields", 400);
+      if (!userName || !email || !password) {
+        throw new AppError("Please fill out all registration fields", 400);
       }
 
-      const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       if (!emailRegex.test(email)) {
         throw new AppError("Email must be a valid email", 400);
       }
 
-      const passwordRegex = new RegExp(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/);
+      const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
       if (!passwordRegex.test(password)) {
         throw new AppError(
           "Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter.",
@@ -76,10 +86,8 @@ router.post(
         password: hashedPassword,
         userName,
         profileImage,
-        role: role || "user", // Set role or default to "user"
+        role: role || "user", // Default to "user" if no role is provided
       });
-
-      console.log("User created:", createdUser);
 
       const token = jwt.sign(
         { userId: createdUser._id },
@@ -87,19 +95,16 @@ router.post(
         { expiresIn: "6h" }
       );
 
-      console.log("Generated token:", token);
-
       res
         .status(201)
         .json({ token, userId: createdUser._id, user: createdUser });
     } catch (err) {
-      console.error("Error during registration:", err);
       next(err);
     }
   }
 );
 
-// Post /register/admin (Only for authenticated admin users)
+// Post /register/admin
 router.post(
   "/register/admin",
   authenticateToken,
@@ -110,16 +115,16 @@ router.post(
       const { userName, email, password } = req.body;
       const profileImage = req.file ? `/uploads/${req.file.filename}` : "";
 
-      if (userName === "" || email === "" || password === "") {
-        throw new AppError("Please fill out the registration fields", 400);
+      if (!userName || !email || !password) {
+        throw new AppError("Please fill out all registration fields", 400);
       }
 
-      const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       if (!emailRegex.test(email)) {
         throw new AppError("Email must be a valid email", 400);
       }
 
-      const passwordRegex = new RegExp(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/);
+      const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
       if (!passwordRegex.test(password)) {
         throw new AppError(
           "Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter.",
@@ -145,21 +150,16 @@ router.post(
         role: "admin", // Explicitly set role to "admin"
       });
 
-      console.log("Admin created:", createdUser);
-
       const token = jwt.sign(
         { userId: createdUser._id },
         process.env.JWT_SECRET,
         { expiresIn: "6h" }
       );
 
-      console.log("Generated token:", token);
-
       res
         .status(201)
         .json({ token, userId: createdUser._id, user: createdUser });
     } catch (err) {
-      console.error("Error during admin registration:", err);
       next(err);
     }
   }
@@ -169,16 +169,13 @@ router.post(
 router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log("Login request received with email:", email);
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      console.log("User not found for email:", email);
       throw new AppError("User not found", 400);
     }
 
     const passwordMatch = await bcrypt.compare(password, existingUser.password);
     if (!passwordMatch) {
-      console.log("Incorrect password for email:", email);
       throw new AppError("Incorrect password", 400);
     }
 
@@ -187,8 +184,6 @@ router.post("/login", async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "6h" }
     );
-
-    console.log("Generated token:", token);
 
     const user = {
       _id: existingUser._id,
@@ -202,7 +197,6 @@ router.post("/login", async (req, res, next) => {
 
     res.status(200).json({ token, userId: existingUser._id, user });
   } catch (err) {
-    console.error("Error during login:", err);
     next(err);
   }
 });
