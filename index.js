@@ -66,7 +66,7 @@ app.get("/uploads/:filename", (req, res, next) => {
   });
 });
 
-// Connect to MongoDB
+// Connect to MongoDB //
 const connectionString = process.env.DATABASE_URL;
 // const connectionString = process.env.MONGODB_URI_LOCAL;
 
