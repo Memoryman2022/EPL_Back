@@ -104,7 +104,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // Serve static files from the uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "api/uploads")));
 
 // Register routes
 app.use("/api/auth", authRoutes);
