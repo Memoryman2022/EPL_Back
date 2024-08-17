@@ -11,7 +11,7 @@ router.get("/updateResults", authenticateToken, async (req, res) => {
       "https://api.football-data.org/v4/competitions/2021/matches?status=FINISHED",
       {
         headers: {
-          "X-Auth-Token": process.env.FOOTBALL_API_TOKEN,
+          "X-Auth-Token": process.env.EXTERNAL_API_KEY,
         },
       }
     );
