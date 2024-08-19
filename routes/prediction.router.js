@@ -30,6 +30,7 @@ router.post("/", authenticateToken, async (req, res) => {
       homeScore,
       awayScore,
       outcome,
+      calculated: false,
     });
 
     await newPrediction.save();
