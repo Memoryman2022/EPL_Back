@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { expressjwt: jwt } = require("express-jwt");
 
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
+// console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 const getTokenFromHeaders = (req) => {
   if (

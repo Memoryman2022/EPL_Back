@@ -7,6 +7,8 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const cron = require("node-cron");
+const axios = require("axios");
 
 const app = express();
 
@@ -67,8 +69,8 @@ app.get("/uploads/:filename", (req, res, next) => {
 });
 
 // Connect to MongoDB ///
-const connectionString = process.env.DATABASE_URL;
-//const connectionString = process.env.MONGODB_URI_LOCAL;
+//const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.MONGODB_URI_LOCAL;
 
 const { allowedOrigins } = require("./config/config");
 // Log the environment and connection target
@@ -116,6 +118,32 @@ app.use("/api", externalApiRouter);
 // Error handling middleware
 app.use(errorHandler);
 app.use(notFoundHandler);
+
+// Schedule the cron job to run at a specific time
+// URL for the local server's updateResults route
+const UPDATE_RESULTS_URL = "http://127.0.0.1:3000/api/results/updateResults";
+// JWT Token for authentication
+const JWT_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmE3YmMzZDU0NjE3M2UwMmU5Y2NjMjYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MjQxNjM1NzJ9.D7w-8CoM_3uz436S8rpzxS3ckWITsjvZ9SgAsgk4qhA";
+// Schedule the cron job to run every 5 minutes
+cron.schedule("* * * * *", async () => {
+  console.log("Cron job triggered at", new Date().toISOString());
+  try {
+    await axios.get(UPDATE_RESULTS_URL, {
+      headers: {
+        Authorization: `Bearer ${JWT_TOKEN}`, // Include the JWT token in the Authorization header
+      },
+    });
+    console.log("Match results updated successfully");
+  } catch (error) {
+    console.error(
+      "Error updating match results via cron job:",
+      error.response?.data || error.message
+    );
+  }
+});
+
+console.log("Cron job scheduled.");
 
 // Start the server
 const PORT = process.env.PORT || 3000;

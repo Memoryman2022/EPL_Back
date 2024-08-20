@@ -180,7 +180,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { userId: existingUser._id },
+      { userId: existingUser._id, role: existingUser.role },
       process.env.JWT_SECRET,
       { expiresIn: "6h" }
     );
@@ -195,6 +195,10 @@ router.post("/login", async (req, res, next) => {
       role: existingUser.role, // Include role in response
     };
 
+    // Log the token and user object
+    console.log("Generated token:", token);
+    console.log("User object to be sent:", user);
+
     res.status(200).json({ token, userId: existingUser._id, user });
   } catch (err) {
     next(err);
@@ -203,6 +207,8 @@ router.post("/login", async (req, res, next) => {
 
 // Get /verify
 router.get("/verify", authenticateToken, (req, res) => {
+  console.log("Verified payload:", req.payload); // Log the verified payload
+
   res.status(200).json(req.payload);
 });
 

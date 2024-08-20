@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const { authenticateToken } = require("../middleware/authenticateToken");
 const { AppError } = require("../middleware/errorHandling");
+const updateUserPositionsAndMovements = require("../utils/userPosition");
 
 // Get user details (protected)
 router.get(
@@ -106,33 +107,22 @@ router.put("/updateScore", async (req, res, next) => {
   }
 });
 
-// Endpoint to update user movements
-router.put("/update-movements", async (req, res) => {
-  const { users } = req.body;
-
+// Endpoint to update user positions and movements
+router.post("/updatePositions", async (req, res) => {
   try {
-    for (let userData of users) {
-      console.log("Updating user:", userData); // Add a log for debugging
+    // Call the function to update user positions and movements
+    await updateUserPositionsAndMovements();
 
-      // Allow `movement` to be either 'up', 'down', or an empty string
-      if (
-        userData.movement !== "up" &&
-        userData.movement !== "down" &&
-        userData.movement !== ""
-      ) {
-        throw new Error(`Invalid movement value: ${userData.movement}`);
-      }
-
-      await User.findByIdAndUpdate(userData._id, {
-        movement: userData.movement,
-        position: userData.position,
-        previousPosition: userData.previousPosition,
-      });
-    }
-    res.status(200).send({ message: "User movements updated successfully" });
+    // Send a success response
+    res
+      .status(200)
+      .json({ message: "User positions and movements updated successfully." });
   } catch (error) {
-    console.error("Failed to update user movements:", error);
-    res.status(500).send({ error: "Failed to update user movements" });
+    // Log and handle errors
+    console.error("Error updating user positions and movements:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating user positions and movements." });
   }
 });
 
