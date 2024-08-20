@@ -22,8 +22,8 @@ router.get("/updateResults", authenticateToken, async (req, res) => {
         fixtureId: match.id,
         homeTeam: match.homeTeam.name,
         awayTeam: match.awayTeam.name,
-        homeScore: match.score.fullTime.homeTeam,
-        awayScore: match.score.fullTime.awayTeam,
+        homeScore: match.score.fullTime.home,
+        awayScore: match.score.fullTime.away,
         outcome,
         date: match.utcDate,
       };

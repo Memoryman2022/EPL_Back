@@ -119,14 +119,14 @@ app.use("/api", externalApiRouter);
 app.use(errorHandler);
 app.use(notFoundHandler);
 
-// Schedule the cron job to run at a specific time
+// UPDATE RESULTS
 // URL for the local server's updateResults route
-const UPDATE_RESULTS_URL = "http://127.0.0.1:3000/api/results/updateResults";
+const UPDATE_RESULTS_URL = process.env.UPDATE_RESULTS_URL;
 // JWT Token for authentication
-const JWT_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmE3YmMzZDU0NjE3M2UwMmU5Y2NjMjYiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MjQxNjM1NzJ9.D7w-8CoM_3uz436S8rpzxS3ckWITsjvZ9SgAsgk4qhA";
+const JWT_TOKEN = process.env.JWT_TOKEN;
+
 // Schedule the cron job to run every 5 minutes
-cron.schedule("* * * * *", async () => {
+cron.schedule("* 23 * * *", async () => {
   console.log("Cron job triggered at", new Date().toISOString());
   try {
     await axios.get(UPDATE_RESULTS_URL, {
@@ -143,7 +143,22 @@ cron.schedule("* * * * *", async () => {
   }
 });
 
-console.log("Cron job scheduled.");
+console.log("API Cron job scheduled.");
+
+//UPDATE SCORES
+const { updateScores } = require("./utils/upateScores");
+
+// Schedule the cron job to run every day at midnight
+cron.schedule("1 23 * * *", async () => {
+  console.log("Cron job triggered at", new Date().toISOString());
+  try {
+    await updateScores();
+    console.log("Scores updated successfully");
+  } catch (error) {
+    console.error("Error updating scores:", error.message);
+  }
+});
+console.log("Score Cron job scheduled.");
 
 // Start the server
 const PORT = process.env.PORT || 3000;
