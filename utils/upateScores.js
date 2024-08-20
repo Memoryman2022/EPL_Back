@@ -6,6 +6,7 @@ const Prediction = require("../models/Predictions.model");
 // Function to update user scores
 const updateScores = async () => {
   try {
+    // Fetch all predictions and results
     const predictions = await Prediction.find({});
     const results = await RealResult.find({});
 
@@ -15,15 +16,17 @@ const updateScores = async () => {
     const predictionsToUpdate = [];
 
     predictions.forEach((prediction) => {
-      // Check if this prediction has already been processed
-      if (prediction.processed) return;
+      // Check if this prediction has already been processed (calculated)
+      if (prediction.calculated) return;
 
+      // Find the matching result for the prediction
       const result = results.find((r) => r.fixtureId === prediction.fixtureId);
       if (result) {
         let score = 0;
         let correctScores = 0;
         let correctOutcomes = 0;
 
+        // Calculate the score based on the prediction's accuracy
         if (
           prediction.homeScore === result.homeScore &&
           prediction.awayScore === result.awayScore &&
@@ -37,6 +40,7 @@ const updateScores = async () => {
           correctOutcomes = 1;
         }
 
+        // Initialize the userScores entry if not already present
         if (!userScores[prediction.userId]) {
           userScores[prediction.userId] = {
             score: 0,
@@ -45,12 +49,13 @@ const updateScores = async () => {
           };
         }
 
+        // Accumulate the score and correct predictions
         userScores[prediction.userId].score += score;
         userScores[prediction.userId].correctScores += correctScores;
         userScores[prediction.userId].correctOutcomes += correctOutcomes;
 
-        // Mark the prediction as processed for later update
-        prediction.processed = true;
+        // Mark the prediction as calculated for later update
+        prediction.calculated = true;
         predictionsToUpdate.push(prediction);
       }
     });
@@ -70,9 +75,14 @@ const updateScores = async () => {
       })
     );
 
-    // Bulk update the predictions after processing
-    await Promise.all(
-      predictionsToUpdate.map((prediction) => prediction.save())
+    // Bulk update predictions to mark them as calculated
+    await Prediction.bulkWrite(
+      predictionsToUpdate.map((prediction) => ({
+        updateOne: {
+          filter: { _id: prediction._id },
+          update: { calculated: true }, // Use the correct field name
+        },
+      }))
     );
 
     // Update positions and other related data if needed

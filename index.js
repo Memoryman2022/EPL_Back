@@ -126,7 +126,7 @@ const UPDATE_RESULTS_URL = process.env.UPDATE_RESULTS_URL;
 const JWT_TOKEN = process.env.JWT_TOKEN;
 
 // Schedule the cron job to run every 5 minutes
-cron.schedule("* 23 * * *", async () => {
+cron.schedule("0 23 * * *", async () => {
   console.log("Cron job triggered at", new Date().toISOString());
   try {
     await axios.get(UPDATE_RESULTS_URL, {
