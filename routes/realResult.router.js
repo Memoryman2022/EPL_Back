@@ -26,6 +26,7 @@ router.get("/updateResults", authenticateToken, async (req, res) => {
         awayScore: match.score.fullTime.away,
         outcome,
         date: match.utcDate,
+        matchday: matchData.matchday,
       };
       // Upsert the match result to the database
       await RealResult.findOneAndUpdate(

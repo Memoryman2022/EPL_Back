@@ -10,6 +10,7 @@ const realResultSchema = new Schema({
   awayScore: { type: Number, required: true },
   outcome: { type: String, required: true },
   date: { type: Date, required: true },
+  matchday: { type: Number, required: true },
 });
 
 const RealResult = mongoose.model("RealResult", realResultSchema, "results");
