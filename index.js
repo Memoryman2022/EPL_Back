@@ -69,8 +69,8 @@ app.get("/uploads/:filename", (req, res, next) => {
 });
 
 // Connect to MongoDB ///
-//const connectionString = process.env.DATABASE_URL;
-const connectionString = process.env.MONGODB_URI_LOCAL;
+const connectionString = process.env.DATABASE_URL;
+//const connectionString = process.env.MONGODB_URI_LOCAL;
 
 const { allowedOrigins } = require("./config/config");
 // Log the environment and connection target
