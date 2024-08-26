@@ -119,41 +119,6 @@ app.use("/api", externalApiRouter);
 app.use(errorHandler);
 app.use(notFoundHandler);
 
-// UPDATE RESULTS
-// URL for the updateResults route
-const UPDATE_RESULTS_URL = process.env.UPDATE_RESULTS_URL;
-
-// Schedule the cron job to run every 5 minutes
-cron.schedule("*/5 * * * *", async () => {
-  console.log("Cron job triggered at", new Date().toISOString());
-  try {
-    await axios.get(UPDATE_RESULTS_URL); // No headers needed if no authentication is required
-    console.log("Match results updated successfully");
-  } catch (error) {
-    console.error(
-      "Error updating match results via cron job:",
-      error.response?.data || error.message
-    );
-  }
-});
-
-console.log("API Cron job scheduled.");
-
-//UPDATE SCORES
-const { updateScores } = require("./utils/upateScores");
-
-// Schedule the cron job to run every day at midnight
-cron.schedule(" */5 * * * *", async () => {
-  console.log("Cron job triggered at", new Date().toISOString());
-  try {
-    await updateScores();
-    console.log("Scores updated successfully");
-  } catch (error) {
-    console.error("Error updating scores:", error.message);
-  }
-});
-console.log("Score Cron job scheduled.");
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, "0.0.0.0", () => {
