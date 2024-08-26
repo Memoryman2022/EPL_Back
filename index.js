@@ -19,7 +19,7 @@ const userRoutes = require("./routes/user.router");
 const predictionRoutes = require("./routes/prediction.router");
 const realResultRoutes = require("./routes/realResult.router");
 const externalApiRouter = require("./routes/externalApi.router");
-const adminRoutes = require(".routes/admin.router");
+const adminRoutes = require("./routes/admin.router");
 
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandling");
 
