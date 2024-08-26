@@ -140,7 +140,7 @@ cron.schedule("*/5 * * * *", async () => {
 console.log("API Cron job scheduled.");
 
 //UPDATE SCORES
-const { updateScores } = require("./utils/updateScores");
+const { updateScores } = require("./utils/upateScores");
 
 // Schedule the cron job to run every day at midnight
 cron.schedule(" */5 * * * *", async () => {
