@@ -120,23 +120,14 @@ app.use(errorHandler);
 app.use(notFoundHandler);
 
 // UPDATE RESULTS
-// URL for the local server's updateResults route
+// URL for the updateResults route
 const UPDATE_RESULTS_URL = process.env.UPDATE_RESULTS_URL;
-// JWT Token for authentication
-const JWT_TOKEN = process.env.JWT_TOKEN;
-
-console.log("UPDATE_RESULTS_URL:", UPDATE_RESULTS_URL);
-console.log("JWT_TOKEN:", JWT_TOKEN);
 
 // Schedule the cron job to run every 5 minutes
 cron.schedule("*/5 * * * *", async () => {
   console.log("Cron job triggered at", new Date().toISOString());
   try {
-    await axios.get(UPDATE_RESULTS_URL, {
-      headers: {
-        Authorization: `Bearer ${JWT_TOKEN}`, // Include the JWT token in the Authorization header
-      },
-    });
+    await axios.get(UPDATE_RESULTS_URL); // No headers needed if no authentication is required
     console.log("Match results updated successfully");
   } catch (error) {
     console.error(
@@ -149,10 +140,10 @@ cron.schedule("*/5 * * * *", async () => {
 console.log("API Cron job scheduled.");
 
 //UPDATE SCORES
-const { updateScores } = require("./utils/upateScores");
+const { updateScores } = require("./utils/updateScores");
 
 // Schedule the cron job to run every day at midnight
-cron.schedule("1 23 * * *", async () => {
+cron.schedule(" */5 * * * *", async () => {
   console.log("Cron job triggered at", new Date().toISOString());
   try {
     await updateScores();

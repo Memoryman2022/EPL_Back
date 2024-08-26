@@ -4,12 +4,7 @@ const axios = require("axios");
 const triggerUpdateResults = async () => {
   try {
     const response = await axios.get(
-      "https://eplbackend.adaptable.app/api/updateResults",
-      {
-        headers: {
-          "X-Auth-Token": process.env.JWT_SECRET, // Use JWT_SECRET if that's what you're passing
-        },
-      }
+      "https://eplbackend.adaptable.app/api/updateResults"
     );
     console.log("Update Results Response:", response.data);
   } catch (error) {
