@@ -205,6 +205,32 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+// Post /guest-login
+router.post("/guest-login", async (req, res, next) => {
+  try {
+    const guestUser = {
+      _id: "guest_id", // Use a placeholder ID or generate a unique ID
+      userName: "Guest User",
+      email: "guest@example.com",
+      role: "guest",
+    };
+
+    const token = jwt.sign(
+      { userId: guestUser._id, role: guestUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "6h" }
+    );
+
+    res.status(200).json({
+      token,
+      userId: guestUser._id,
+      user: guestUser,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Get /verify
 router.get("/verify", authenticateToken, (req, res) => {
   console.log("Verified payload:", req.payload); // Log the verified payload
