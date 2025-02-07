@@ -9,7 +9,7 @@ const allowedOrigins = [
   // process.env.NODE_ENV === "production"
   "http://localhost:5173",
   process.env.ORIGIN,
-  "https://epl2024.netlify.app",
+  "https://epl2024.netlify.app/",
 ];
 
 module.exports = {
