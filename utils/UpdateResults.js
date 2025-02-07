@@ -4,7 +4,7 @@ const axios = require("axios");
 const triggerUpdateResults = async () => {
   try {
     const response = await axios.get(
-      "https://eplbackend.adaptable.app/api/updateResults"
+      "https://eplbackend.railway.app/api/updateResults"
     );
     console.log("Update Results Response:", response.data);
   } catch (error) {
