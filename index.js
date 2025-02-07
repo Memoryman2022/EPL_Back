@@ -94,11 +94,7 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: [
-      allowedOrigins,
-      process.env.ORIGIN,
-      "https://epl2024.netlify.app/",
-    ],
+    origin: [allowedOrigins, process.env.ORIGIN, "https://epl2024.netlify.app"],
     credentials: true,
   })
 );
