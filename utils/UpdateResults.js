@@ -4,7 +4,7 @@ const axios = require("axios");
 const triggerUpdateResults = async () => {
   try {
     const response = await axios.get(
-      "https://eplback-production.up.railway.app/api/updateResults"
+      "https://epl-back-0jvz.onrender.com/api/updateResults"
     );
     console.log("Update Results Response:", response.data);
   } catch (error) {
@@ -17,3 +17,5 @@ const triggerUpdateResults = async () => {
 
 // Call the function wherever needed in your backend
 triggerUpdateResults();
+
+//https://epl-back-0jvz.onrender.com
